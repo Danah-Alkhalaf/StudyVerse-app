@@ -24,8 +24,8 @@
 - [ ] Set up Firestore collections for courses and channels
 
 ## Fatima Hajeeh
-- [ ] Create ProgressModel
-- [ ] Create XP and Coins data structure
+- [✓] Create ProgressModel
+- [✓] Create XP and Coins data structure
 
 ## Noor Adnan
 - [ ] Create QuizModel
@@ -52,7 +52,7 @@
 - [ ] Create ChannelViewModel
 
 ## Fatima Hajeeh
-- [ ] Build StudentHomeView UI
+- [✓] Build StudentHomeView UI
 
 ## Noor Adnan
 - [ ] Build QuizDetailsView UI
@@ -99,7 +99,7 @@
 - [ ] Build ChannelDashboardView
 
 ## Fatima Hajeeh
-- [ ] Build LeaderboardView
+- [✓] Build LeaderboardView
 
 ## Noor Adnan
 - [ ] Implement quiz timer functionality
@@ -123,7 +123,7 @@
 - [ ] Remove member functionality
 
 ## Fatima Hajeeh
-- [ ] Build ProgressTrackingView
+- [✓] Build ProgressTrackingView
 
 ## Noor Adnan
 - [ ] Implement scoring logic
@@ -146,7 +146,7 @@
 - [ ] Build JoinChannelView
 
 ## Fatima Hajeeh
-- [ ] Build StudyPlanView
+- [✓] Build StudyPlanView
 
 ## Noor Adnan
 - [ ] Build QuizResultsView
