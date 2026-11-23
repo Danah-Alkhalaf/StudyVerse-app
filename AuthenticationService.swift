@@ -121,7 +121,8 @@ final class AuthenticationService {
     // MARK: Sign up
 
     /// Creates the login, the user document, the username record and the
-    /// starting progress. Tutors are saved with status "pending".
+    /// starting progress. Tutors are saved with status "pending" and stay
+    /// logged in so they can submit the Tutor Verification screen.
     @discardableResult
     func signUp(fullName: String,
                 username: String,
@@ -185,8 +186,9 @@ final class AuthenticationService {
         change.displayName = username
         try? await change.commitChanges()
 
-        // Tutors must wait for approval, so they are not left logged in.
-        if role == .tutor { try? auth.signOut() }
+        // Everyone stays logged in after sign up, so new tutors can go straight
+        // to the Tutor Verification screen. Pending tutors are only blocked
+        // the next time they log in (see logIn).
 
         var saved = newUser
         saved.id = uid
