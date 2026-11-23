@@ -154,7 +154,7 @@ struct ProfileView: View {
         case .account:
             ComingSoonScreen(title: "Account")                  // AccountManagementView (next branch)
         case .settings:
-            ComingSoonScreen(title: "Settings")                 // SettingsView (next branch)
+            SettingsView()
         case .reportIssue:
             ComingSoonScreen(title: "Report an Issue")          // ReportIssueView (next branch)
         }

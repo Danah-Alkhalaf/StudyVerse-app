@@ -55,7 +55,9 @@ final class LoginViewModel {
         defer { isLoading = false }
 
         do {
-            return try await auth.logIn(usernameOrEmail: usernameOrEmail, password: password)
+            let user = try await auth.logIn(usernameOrEmail: usernameOrEmail, password: password)
+            AppAppearance.shared.apply(user.settings)      // their saved theme
+            return user
         } catch {
             show(AuthError.from(error))
             return nil

@@ -41,7 +41,9 @@ final class ProfileViewModel {
     func load() async {
         if user == nil { state = .loading }
         do {
-            state = .loaded(try await auth.fetchCurrentUser())
+            let user = try await auth.fetchCurrentUser()
+            state = .loaded(user)
+            AppAppearance.shared.apply(user.settings)      // their saved theme
         } catch {
             // Keep showing old data if we had it; only show the error screen
             // when there is nothing to show.
