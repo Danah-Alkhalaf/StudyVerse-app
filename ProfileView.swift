@@ -161,7 +161,7 @@ struct ProfileView: View {
         case .settings:
             SettingsView()
         case .reportIssue:
-            ComingSoonScreen(title: "Report an Issue")          // ReportIssueView (next branch)
+            ReportIssueView()
         }
     }
 }
