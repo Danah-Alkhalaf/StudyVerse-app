@@ -7,7 +7,7 @@
 //
 //  Two screens:
 //  - ForgotPasswordView: type your email, tap "Send Reset Link".
-//  - CheckEmailView: "Check your email", link expires in 30 minutes,
+//  - CheckEmailView: "Check your email", link expires in 1 hour,
 //    Resend Link, Back to Log In.
 //
 
@@ -116,7 +116,7 @@ struct CheckEmailView: View {
                         Text(email)
                             .fontWeight(.semibold)
                             .foregroundStyle(AppTheme.textPrimary)
-                        Text("The link expires in 30 minutes.")
+                        Text("The link expires in 1 hour.")
                             .padding(.top, 8)
                     }
                     .font(.body)
