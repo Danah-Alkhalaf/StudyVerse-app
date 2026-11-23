@@ -16,10 +16,13 @@ enum AuthRoute: Hashable {
     case login(passwordJustUpdated: Bool = false)
     case signUp
     case forgotPassword
+    case checkEmail(String)
+    case tutorVerification
 }
 
 struct WelcomeView: View {
-    /// Called after a successful log in, so the app can switch to the main tabs.
+    /// Called after a successful log in or student sign up, so the app can
+    /// switch to the main tabs.
     var onLoggedIn: (UserModel) -> Void = { _ in }
 
     @State private var path: [AuthRoute] = []
@@ -62,11 +65,16 @@ struct WelcomeView: View {
                               onForgotPassword: { path.append(.forgotPassword) },
                               onSignUp: { path = [.signUp] })
                 case .signUp:
-                    // TODO: replace with StudentRegistrationView (21 November task)
-                    ComingSoonView(title: "Sign Up")
+                    SignUpView(onStudentSignedUp: onLoggedIn,
+                               onTutorSignedUp: { _ in path = [.tutorVerification] },
+                               onLogIn: { path = [.login()] })
                 case .forgotPassword:
-                    // TODO: replace with ForgotPasswordView (23 November task)
-                    ComingSoonView(title: "Forgot Password")
+                    ForgotPasswordView(onLinkSent: { email in path.append(.checkEmail(email)) })
+                case .checkEmail(let email):
+                    CheckEmailView(email: email, onBackToLogIn: { path = [.login()] })
+                case .tutorVerification:
+                    // TODO: replace with TutorVerificationView (24 November task)
+                    ComingSoonView(title: "Tutor Verification")
                 }
             }
         }

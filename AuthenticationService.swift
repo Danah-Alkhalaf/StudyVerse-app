@@ -102,6 +102,11 @@ final class AuthenticationService {
         username.wholeMatch(of: #/[A-Za-z0-9_]{3,20}/#) != nil
     }
 
+    /// Simple "something@something.something" check before calling Firebase.
+    static func isValidEmail(_ email: String) -> Bool {
+        email.wholeMatch(of: #/[^@\s]+@[^@\s]+\.[^@\s]+/#) != nil
+    }
+
     static func isValidPassword(_ password: String) -> Bool {
         password.count >= minPasswordLength
     }

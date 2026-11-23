@@ -22,6 +22,7 @@ struct InputField: View {
     var isSecure: Bool = false
     var keyboard: UIKeyboardType = .default
     var contentType: UITextContentType? = nil
+    var capitalization: TextInputAutocapitalization = .never
 
     @State private var isRevealed = false
 
@@ -45,7 +46,7 @@ struct InputField: View {
                 .font(.body)
                 .foregroundStyle(AppTheme.textPrimary)
                 .textContentType(contentType)
-                .textInputAutocapitalization(.never)
+                .textInputAutocapitalization(capitalization)
                 .autocorrectionDisabled()
 
                 if isSecure {
