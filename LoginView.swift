@@ -36,7 +36,7 @@ struct LoginView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            ScreenHeader(title: "Log In", showsBack: true, onBack: { dismiss() })
+            AuthBackHeader(onBack: { dismiss() })
 
             ScrollView {
                 VStack(alignment: .leading, spacing: AppTheme.spacing) {

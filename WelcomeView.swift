@@ -30,6 +30,7 @@ struct WelcomeView: View {
                 Spacer()
 
                 AppLogo()
+                    .padding(.top, 56)      // sits a bit lower than centre
                     .padding(.bottom, 8)
 
                 Text("StudyVerse")
@@ -75,32 +76,21 @@ struct WelcomeView: View {
 
 // MARK: - App logo
 
-/// Placeholder logo built from SF Symbols (graduation cap inside a yellow
-/// star) until the real alien logo image is added to Assets.
+/// The official StudyVerse logo (studyverse-logo.png): about 180pt,
+/// rounded corners and a soft shadow.
+/// UIImage(named:) finds the file both in Assets.xcassets and as a loose
+/// file in the app bundle, so it works either way the project adds it.
 struct AppLogo: View {
-    @ScaledMetric(relativeTo: .largeTitle) private var size: CGFloat = 140
+    var size: CGFloat = 180
 
     var body: some View {
-        ZStack {
-            Image(systemName: "star.fill")
-                .resizable()
-                .scaledToFit()
-                .foregroundStyle(AppTheme.chipYellow)
-                .overlay {
-                    Image(systemName: "star")
-                        .resizable()
-                        .scaledToFit()
-                        .foregroundStyle(AppTheme.primary.opacity(0.25))
-                }
-            Image(systemName: "graduationcap.fill")
-                .resizable()
-                .scaledToFit()
-                .foregroundStyle(AppTheme.primary)
-                .frame(width: size * 0.38)
-                .offset(y: size * 0.04)
-        }
-        .frame(width: size, height: size)
-        .accessibilityHidden(true)
+        Image(uiImage: UIImage(named: "studyverse-logo") ?? UIImage())
+            .resizable()
+            .scaledToFill()
+            .frame(width: size, height: size)
+            .clipShape(RoundedRectangle(cornerRadius: size * 0.22, style: .continuous))
+            .shadow(color: AppTheme.primary.opacity(0.18), radius: 20, y: 10)
+            .accessibilityHidden(true)   // "StudyVerse" title right below says it
     }
 }
 
