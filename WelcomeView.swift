@@ -18,6 +18,7 @@ enum AuthRoute: Hashable {
     case forgotPassword
     case checkEmail(String)
     case tutorVerification
+    case waitingApproval
 }
 
 struct WelcomeView: View {
@@ -73,8 +74,16 @@ struct WelcomeView: View {
                 case .checkEmail(let email):
                     CheckEmailView(email: email, onBackToLogIn: { path = [.login()] })
                 case .tutorVerification:
-                    // TODO: replace with TutorVerificationView (24 November task)
-                    ComingSoonView(title: "Tutor Verification")
+                    TutorVerificationView(onSubmitted: { path.append(.waitingApproval) })
+                case .waitingApproval:
+                    WaitingApprovalView(
+                        onBackToLogIn: {
+                            // Pending tutors can't use the app yet, so log them out.
+                            try? AuthenticationService.shared.logOut()
+                            path = [.login()]
+                        },
+                        onEditDetails: { path.removeLast() }   // form still has their details
+                    )
                 }
             }
         }
@@ -109,28 +118,6 @@ struct AppLogo: View {
         }
         .frame(width: size, height: size)
         .accessibilityHidden(true)
-    }
-}
-
-// MARK: - Temporary placeholder
-
-/// Shown for screens that are not built yet. Delete once they exist.
-private struct ComingSoonView: View {
-    let title: String
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        VStack(spacing: 0) {
-            ScreenHeader(title: title, showsBack: true, onBack: { dismiss() })
-            Spacer()
-            Text("Coming soon")
-                .font(.headline)
-                .foregroundStyle(AppTheme.textSecondary)
-            Spacer()
-        }
-        .studyverseBackground()
-        .navigationBarBackButtonHidden(true)
-        .toolbar(.hidden, for: .navigationBar)
     }
 }
 
