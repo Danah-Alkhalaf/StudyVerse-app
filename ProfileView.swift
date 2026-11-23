@@ -28,6 +28,9 @@ enum ProfileRoute: Hashable {
 struct ProfileView: View {
     var showsBack: Bool = false
     var onLoggedOut: () -> Void = {}
+    /// After a password change the user is logged out; the app should show
+    /// WelcomeView(startAt: [.login(passwordJustUpdated: true)]).
+    var onPasswordChanged: () -> Void = {}
 
     @State private var viewModel: ProfileViewModel
     @State private var confirmsLogOut = false
@@ -35,9 +38,11 @@ struct ProfileView: View {
 
     init(showsBack: Bool = false,
          previewUser: UserModel? = nil,
-         onLoggedOut: @escaping () -> Void = {}) {
+         onLoggedOut: @escaping () -> Void = {},
+         onPasswordChanged: @escaping () -> Void = {}) {
         self.showsBack = showsBack
         self.onLoggedOut = onLoggedOut
+        self.onPasswordChanged = onPasswordChanged
         _viewModel = State(initialValue: ProfileViewModel(previewUser: previewUser))
     }
 
@@ -152,7 +157,7 @@ struct ProfileView: View {
         case .shop:
             ComingSoonScreen(title: "Shop")                     // ShopView (1 Dec)
         case .account:
-            ComingSoonScreen(title: "Account")                  // AccountManagementView (next branch)
+            AccountManagementView(onPasswordChanged: onPasswordChanged)
         case .settings:
             SettingsView()
         case .reportIssue:

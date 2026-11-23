@@ -34,6 +34,10 @@ enum AuthError: LocalizedError, Equatable {
     case notLoggedIn
     case userDocumentMissing
     case network
+    case wrongCurrentPassword
+    case passwordsDontMatch
+    case requiresRecentLogin
+    case emailInUseByOther
     case unknown
 
     var errorDescription: String? {
@@ -50,6 +54,10 @@ enum AuthError: LocalizedError, Equatable {
         case .notLoggedIn:            return "You are not logged in."
         case .userDocumentMissing:    return "We couldn't find your account details. Please try again."
         case .network:                return "No internet connection. Check your connection and try again."
+        case .wrongCurrentPassword:   return "Current password is incorrect."
+        case .passwordsDontMatch:     return "Passwords don't match."
+        case .requiresRecentLogin:    return "For your security, please log out and log in again, then try again."
+        case .emailInUseByOther:      return "This email is already used by another account."
         case .unknown:                return "Something went wrong. Please try again."
         }
     }
@@ -69,6 +77,7 @@ enum AuthError: LocalizedError, Equatable {
         case .weakPassword:                                     return .passwordTooShort
         case .invalidEmail:                                     return .invalidEmail
         case .networkError:                                     return .network
+        case .requiresRecentLogin:                              return .requiresRecentLogin
         default:                                                return .unknown
         }
     }
@@ -211,6 +220,7 @@ final class AuthenticationService {
         do {
             let email = input.contains("@") ? input : try await email(forUsername: input)
             try await auth.signIn(withEmail: email, password: password)
+            try? await syncEmailIfChanged()
 
             let user = try await fetchCurrentUser()
             guard user.status.canLogIn else {
@@ -267,6 +277,106 @@ final class AuthenticationService {
             let snapshot = try await users.document(uid).getDocument()
             guard snapshot.exists else { throw AuthError.userDocumentMissing }
             return try snapshot.data(as: UserModel.self)
+        } catch {
+            throw AuthError.from(error)
+        }
+    }
+
+    // MARK: Account management (AccountManagementView)
+
+    /// Changes the username in one transaction: claims usernames/{new},
+    /// frees usernames/{old} and updates users/{uid}.username, so two people
+    /// can never end up with the same name.
+    func changeUsername(to newUsername: String) async throws {
+        guard let user = auth.currentUser else { throw AuthError.notLoggedIn }
+        let new = newUsername.trimmingCharacters(in: .whitespaces).lowercased()
+        guard Self.isValidUsername(new) else { throw AuthError.invalidUsername }
+
+        let userRef = users.document(user.uid)
+        let newRef = usernames.document(new)
+        let usernamesRef = usernames              // captured for the transaction block
+        do {
+            let result = try await db.runTransaction { transaction, errorPointer -> Any? in
+                do {
+                    let userSnap = try transaction.getDocument(userRef)
+                    let old = (userSnap.get("username") as? String) ?? ""
+                    let email = (userSnap.get("email") as? String) ?? (user.email ?? "")
+                    if old == new { return NSNumber(value: true) }             // nothing to do
+                    if try transaction.getDocument(newRef).exists {
+                        return NSNumber(value: false)                         // taken
+                    }
+                    try transaction.setData(from: UsernameRecord(uid: user.uid, email: email), forDocument: newRef)
+                    if !old.isEmpty { transaction.deleteDocument(usernamesRef.document(old)) }
+                    transaction.updateData(["username": new], forDocument: userRef)
+                    return NSNumber(value: true)
+                } catch {
+                    errorPointer?.pointee = error as NSError
+                    return nil
+                }
+            }
+            guard (result as? NSNumber)?.boolValue == true else { throw AuthError.usernameTaken }
+        } catch {
+            throw AuthError.from(error)
+        }
+
+        let change = user.createProfileChangeRequest()          // Fatima's home reads this
+        change.displayName = new
+        try? await change.commitChanges()
+    }
+
+    /// Firebase's safe way to change email: it sends a link to the NEW
+    /// address, and the email only changes after the user taps it.
+    /// users/{uid}.email is then updated by syncEmailIfChanged().
+    func requestEmailChange(to newEmail: String) async throws {
+        guard let user = auth.currentUser else { throw AuthError.notLoggedIn }
+        let email = newEmail.trimmingCharacters(in: .whitespaces).lowercased()
+        guard Self.isValidEmail(email) else { throw AuthError.invalidEmail }
+        do {
+            try await user.sendEmailVerification(beforeUpdatingEmail: email)
+        } catch {
+            let mapped = AuthError.from(error)
+            throw mapped == .emailAlreadyRegistered ? AuthError.emailInUseByOther : mapped
+        }
+    }
+
+    /// If the login email changed (the user tapped the confirmation link),
+    /// copy it into users/{uid}.email and usernames/{username}.email so
+    /// logging in with the username keeps working.
+    func syncEmailIfChanged() async throws {
+        guard let user = auth.currentUser else { return }
+        try await user.reload()
+        guard let authEmail = auth.currentUser?.email?.lowercased() else { return }
+
+        let userRef = users.document(user.uid)
+        let snapshot = try await userRef.getDocument()
+        let storedEmail = (snapshot.get("email") as? String) ?? ""
+        let username = (snapshot.get("username") as? String) ?? ""
+        guard storedEmail != authEmail else { return }
+
+        let batch = db.batch()
+        batch.updateData(["email": authEmail], forDocument: userRef)
+        if !username.isEmpty {
+            batch.updateData(["email": authEmail], forDocument: usernames.document(username))
+        }
+        try await batch.commit()
+    }
+
+    /// Checks the current password first (Firebase requires a recent log in
+    /// to change a password), then sets the new one.
+    func changePassword(current: String, new: String) async throws {
+        guard let user = auth.currentUser, let email = user.email else { throw AuthError.notLoggedIn }
+        guard Self.isValidPassword(new) else { throw AuthError.passwordTooShort }
+
+        do {
+            let credential = EmailAuthProvider.credential(withEmail: email, password: current)
+            try await user.reauthenticate(with: credential)
+        } catch {
+            let mapped = AuthError.from(error)
+            throw mapped == .incorrectCredentials ? AuthError.wrongCurrentPassword : mapped
+        }
+
+        do {
+            try await user.updatePassword(to: new)
         } catch {
             throw AuthError.from(error)
         }

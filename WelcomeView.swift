@@ -26,7 +26,14 @@ struct WelcomeView: View {
     /// switch to the main tabs.
     var onLoggedIn: (UserModel) -> Void = { _ in }
 
-    @State private var path: [AuthRoute] = []
+    @State private var path: [AuthRoute]
+
+    /// `startAt` opens a screen straight away, e.g. after a password change:
+    /// WelcomeView(startAt: [.login(passwordJustUpdated: true)]) { ... }
+    init(startAt: [AuthRoute] = [], onLoggedIn: @escaping (UserModel) -> Void = { _ in }) {
+        _path = State(initialValue: startAt)
+        self.onLoggedIn = onLoggedIn
+    }
 
     var body: some View {
         NavigationStack(path: $path) {
