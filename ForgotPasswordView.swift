@@ -23,7 +23,7 @@ struct ForgotPasswordView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            ScreenHeader(title: "Forgot Password", showsBack: true, onBack: { dismiss() })
+            AuthBackHeader(onBack: { dismiss() })
 
             ScrollView {
                 VStack(alignment: .leading, spacing: AppTheme.spacing) {
@@ -92,7 +92,7 @@ struct CheckEmailView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            ScreenHeader(title: "Forgot Password", showsBack: true, onBack: { dismiss() })
+            AuthBackHeader(onBack: { dismiss() })
 
             ScrollView {
                 VStack(spacing: AppTheme.spacing) {

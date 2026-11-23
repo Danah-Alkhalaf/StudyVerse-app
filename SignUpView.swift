@@ -26,7 +26,7 @@ struct SignUpView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            ScreenHeader(title: "Sign Up", showsBack: true, onBack: { dismiss() })
+            AuthBackHeader(onBack: { dismiss() })
 
             ScrollView {
                 VStack(alignment: .leading, spacing: AppTheme.spacing) {
@@ -85,10 +85,16 @@ struct SignUpView: View {
                         .submitLabel(.go)
                         .onSubmit(signUp)
 
+                    Text("By signing up you agree to the Terms and Privacy Policy.")
+                        .font(.footnote)
+                        .foregroundStyle(AppTheme.textSecondary)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .multilineTextAlignment(.center)
+                        .padding(.top, 8)
+
                     PrimaryButton(title: viewModel.buttonTitle,
                                   isLoading: viewModel.isLoading,
                                   action: signUp)
-                        .padding(.top, 8)
 
                     HStack(spacing: 4) {
                         Text("Already have an account?")
