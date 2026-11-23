@@ -56,3 +56,15 @@ enum AppTheme {
     static let spacing: CGFloat = 16
     static let minTapSize: CGFloat = 44     // Apple HIG minimum touch target
 }
+
+// MARK: - Buttons & inputs (added by Maira Zaman, branch Welcome-View)
+// Values from the Figma prototype; used by PrimaryButton, SecondaryButton, InputField.
+
+extension AppTheme {
+    static let chipYellow: Color     = Color(hex: "#FFF0A8")   // XP / coin chips, logo star
+    static let inputBorder: Color    = navEnd                  // #b8def1 blue
+    static let buttonHeight: CGFloat = 50
+    static let buttonRadius: CGFloat = 16
+    static let inputHeight: CGFloat  = 48
+    static let inputRadius: CGFloat  = 14
+}
