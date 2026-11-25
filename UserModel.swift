@@ -99,7 +99,7 @@ struct UserModel: Identifiable, Codable, Equatable {
                   status: AccountStatus.initial(for: role))
     }
 
-    // Firestore field names (agreed in CLAUDE.md, do not rename alone)
+    // Firestore field names (agreed in the project spec, do not rename alone)
     enum CodingKeys: String, CodingKey {
         case id, fullName, username, email, role, status
         case avatar, pet, ownedItems, settings, createdAt
