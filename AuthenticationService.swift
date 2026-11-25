@@ -19,7 +19,7 @@ import Foundation
 import FirebaseAuth
 import FirebaseFirestore
 
-// MARK: - Friendly errors (messages from CLAUDE.md / the prototype)
+// MARK: - Friendly errors (messages from the project spec / the prototype)
 
 enum AuthError: LocalizedError, Equatable {
     case incorrectCredentials
@@ -90,7 +90,7 @@ final class AuthenticationService {
 
     static let shared = AuthenticationService()
 
-    /// Demo starting balance from CLAUDE.md.
+    /// Demo starting balance from the project spec.
     static let startingCoins = 320
     static let minPasswordLength = 8
 
