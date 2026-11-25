@@ -7,7 +7,7 @@
 //
 //  First screen for logged-out users: logo, app name, tagline,
 //  "Log In" and "Sign Up". It owns the NavigationStack for the auth screens.
-//  No tab bar here (CLAUDE.md: navbar is not shown on login/sign-up screens).
+//  No tab bar here (the project spec: navbar is not shown on login/sign-up screens).
 //
 
 import SwiftUI
